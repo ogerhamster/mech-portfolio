@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>带式输送机传动轴设计计算书</title>
+<style>
+@page{size:A4;margin:16mm 18mm}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:#fff;color:#1f2937;font-family:-apple-system,"PingFang SC","Microsoft YaHei",serif;font-size:11pt;line-height:1.75}
+.page{max-width:760px;margin:0 auto;padding:24px 8px}
+h1{font-size:20pt;margin:0 0 6px;color:#1F3864;letter-spacing:.5px}
+.sub{color:#6b7280;font-size:10.5pt;margin-bottom:4px}
+.meta{color:#9ca3af;font-size:9pt;border-bottom:2px solid #1F3864;padding-bottom:12px;margin-bottom:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+h2{font-size:12.5pt;color:#1F3864;margin:20px 0 8px;padding-bottom:4px;border-bottom:1px solid #dbe3f0}
+h2 .n{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;background:#1F3864;color:#fff;border-radius:5px;font-size:10pt;margin-right:8px}
+p{margin:6px 0}
+.formula{background:#f4f6fa;border-left:3px solid #1F3864;padding:9px 12px;margin:8px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:9.5pt;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:9.5pt}
+th,td{border:1px solid #dbe3f0;padding:5px 8px;text-align:left}
+th{background:#eef2f9;color:#1F3864;font-weight:600}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:9pt;color:#6b7280;margin:4px 0 0}
+.hl{background:#fff8e6;padding:8px 12px;border-radius:6px;font-size:10pt;margin:10px 0}
+.tag{display:inline-block;font-size:8.5pt;color:#196c3a;background:#e7f6ec;padding:1px 8px;border-radius:5px;margin-left:6px}
+.svg{margin:10px 0;text-align:center}
+footer{margin-top:26px;padding-top:10px;border-top:1px solid #dbe3f0;font-size:8.5pt;color:#9ca3af;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.pb{page-break-before:always}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>带式输送机传动轴设计计算书</h1>
+<div class="sub">初算：机械设计速算工具箱　|　复核：弯扭组合强度、键连接、轴承寿命</div>
+<div class="meta"><span>陈诗未　·　机械设计制造及其自动化</span><span>2026.11</span></div>
+
+<h2><span class="n">1</span>设计任务与已知条件</h2>
+<p>为一条水平带式输送机设计传动滚筒轴。载荷平稳，每日工作 8 h，常温、无腐蚀。</p>
+<table>
+<tr><th>参数</th><th>符号</th><th>数值</th><th>单位</th></tr>
+<tr><td>输送带牵引力</td><td>F</td><td class="num">3000</td><td>N</td></tr>
+<tr><td>带速</td><td>v</td><td class="num">1.2</td><td>m/s</td></tr>
+<tr><td>滚筒直径</td><td>D</td><td class="num">400</td><td>mm</td></tr>
+<tr><td>传动总效率</td><td>η</td><td class="num">0.85</td><td>—</td></tr>
+<tr><td>轴承跨距</td><td>L</td><td class="num">450</td><td>mm</td></tr>
+</table>
+
+<h2><span class="n">2</span>功率、转速与扭矩</h2>
+<div class="formula">输送带有效功率  P_w = F·v/1000 = 3000×1.2/1000 = 3.60 kW
+电机所需功率    P_m = P_w/η = 3.60/0.85 = 4.24 kW → 选 5.5 kW 标准电机
+滚筒转速        n = 60v/(πD) = 60×1.2/(π×0.4) = 57.3 r/min
+配减速器 i=25   n' = 1440/25 = 57.6 r/min，带速 1.207 m/s，误差 0.6%
+滚筒轴扭矩      T = 9550·P_w/n' = 9550×3.60/57.6 = 597 N·m</div>
+<p class="note">选 5.5 kW 是留了 1.3 倍功率余量，用于启动和瞬时过载；减速器速比取标准值 25，带速偏差 0.6%，在输送机允许范围内。</p>
+
+<h2><span class="n">3</span>轴径初估（扭转强度）</h2>
+<p>材料选 45 钢正火，取 A₀=118，按扭转强度初估最小轴径：</p>
+<div class="formula">d ≥ A₀·(P/n)^(1/3) = 118×(3.60/57.6)^(1/3) = 118×0.3969 = 46.8 mm
+向上取标准直径 → d₀ = 48 mm</div>
+<p class="note">这一步只保证扭转强度，是「速算工具箱」的轴径模块给出的初值。滚筒轴还要承受带张力产生的弯矩，必须复核。</p>
+
+<h2><span class="n">4</span>弯扭组合强度校核</h2>
+<p>取带与滚筒的摩擦系数 μ=0.3、包角 180°，则 F₁/F₂=e^μθ≈2；由 F₁−F₂=3000 N 得 F₁=6000 N、F₂=3000 N，两股带张力合力近似为：</p>
+<div class="formula">R = F₁ + F₂ = 9000 N</div>
+<div class="svg">
+<svg viewBox="0 0 620 170" width="100%" height="150" xmlns="http://www.w3.org/2000/svg">
+  <line x1="90" y1="95" x2="530" y2="95" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="90,95 80,120 100,120" fill="#1F3864"/>
+  <polygon points="530,95 520,120 540,120" fill="#1F3864"/>
+  <line x1="90" y1="120" x2="530" y2="120" stroke="#c7d2fe" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="310" y1="20" x2="310" y2="90" stroke="#c0392b" stroke-width="3"/>
+  <polygon points="310,95 302,78 318,78" fill="#c0392b"/>
+  <text x="320" y="42" font-size="13" fill="#c0392b" font-family="sans-serif">R = 9000 N</text>
+  <text x="70" y="140" font-size="12" fill="#4b5563" font-family="sans-serif">A</text>
+  <text x="526" y="140" font-size="12" fill="#4b5563" font-family="sans-serif">B</text>
+  <line x1="90" y1="158" x2="530" y2="158" stroke="#9ca3af" stroke-width="1"/>
+  <line x1="90" y1="153" x2="90" y2="163" stroke="#9ca3af"/>
+  <line x1="530" y1="153" x2="530" y2="163" stroke="#9ca3af"/>
+  <text x="280" y="155" font-size="12" fill="#6b7280" font-family="sans-serif">L = 450 mm</text>
+</svg>
+</div>
+<p>载荷居中，最大弯矩在跨中：</p>
+<div class="formula">M = R·L/4 = 9000×0.45/4 = 1012.5 N·m
+M_eq = √(M² + (αT)²) = √(1012.5² + (0.6×597)²) = 1074 N·m   （α=0.6，扭矩按脉动循环）
+d ≥ [32·M_eq/(π·[σ₋₁])]^(1/3) = [32×1074×10³/(π×60)]^(1/3) = 56.7 mm
+向上取标准直径 → d = 60 mm
+实际应力 σ = M_eq/W = 1074×10³/(π×60³/32) = 50.7 MPa &lt; [σ₋₁]=60 MPa  ✓</div>
+<div class="hl"><b>关键结论：</b>扭转初估只要 48 mm，弯扭校核后必须 60 mm。滚筒轴的主要矛盾是带张力产生的弯矩，不是扭矩——只看第 3 步会设计出偏细的轴。</div>
+
+<h2><span class="n">5</span>键连接校核</h2>
+<p>轴颈 60 mm，选 A 型平键 18×11，键长 80 mm，材料 45 钢，许用挤压应力取 100 MPa：</p>
+<div class="formula">σ_p = 4T/(d·h·l) = 4×597×10³/(60×11×80) = 45.5 MPa &lt; 100 MPa  ✓</div>
+
+<h2><span class="n">6</span>轴承选型与寿命</h2>
+<p>轴颈 60 mm，选深沟球轴承 6212（C=47.5 kN，C₀=32.8 kN）。两端对称布置，每端径向载荷 R/2=4.5 kN，无轴向力，P=4.5 kN：</p>
+<div class="formula">L₁₀ₕ = (10⁶/(60n))·(C/P)³ = (10⁶/(60×57.6))×(47.5/4.5)³ = 3.4×10⁵ h</div>
+<p class="note">寿命远超 20000 h 的设计目标。这里轴承尺寸是由轴颈结构决定的，不是寿命算出来的——这是输送机滚筒轴的典型特征。</p>
+
+<h2><span class="n">7</span>结论与可改进点</h2>
+<table>
+<tr><th>项目</th><th>结果</th><th>判定</th></tr>
+<tr><td>轴径初估</td><td>48 mm</td><td>仅扭转</td></tr>
+<tr><td>弯扭校核后轴径</td><td>60 mm</td><td><span class="tag">通过</span></td></tr>
+<tr><td>实际弯曲应力</td><td>50.7 MPa</td><td><span class="tag">通过</span></td></tr>
+<tr><td>键连接挤压应力</td><td>45.5 MPa</td><td><span class="tag">通过</span></td></tr>
+<tr><td>轴承 L₁₀ₕ</td><td>3.4×10⁵ h</td><td><span class="tag">通过</span></td></tr>
+</table>
+<p><b>可改进点：</b>若把轴承跨距从 450 mm 缩到 350 mm，弯矩降为 787 N·m，轴径可回到 55 mm 以下，整轴减重约 12%；代价是滚筒两端的安装空间变紧，需要重新布置轴承座。</p>
+
+<footer>
+<span>初算工具：机械设计速算工具箱（自研，四模块）</span>
+<span>复核依据：机械设计教材扭转/弯扭组合公式、平键挤压强度、轴承寿命公式</span>
+</footer>
+</div>
+</body>
+</html>

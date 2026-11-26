@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机械设计速算工具箱</title>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--accent:#1F3864;--bg:#f6f7f9;--card:#ffffff;--soft:#eef2f9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 48px}
+header{padding:30px 0 8px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+h1{font-size:21px;margin:0;color:var(--accent);letter-spacing:.3px}
+.sub{color:var(--muted);font-size:13px;margin-top:6px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:16px 0 14px;-webkit-overflow-scrolling:touch}
+.tab{border:1px solid var(--line);background:#fff;padding:8px 15px;border-radius:999px;font-size:14px;cursor:pointer;white-space:nowrap;color:#374151;transition:.15s}
+.tab:hover{border-color:#c7d2fe}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.panel.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{font-size:12.5px;color:var(--muted);display:block;margin-bottom:6px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit}
+input:focus,select:focus{outline:2px solid #c7d2fe;border-color:var(--accent)}
+.result{margin-top:18px;background:var(--soft);border-radius:12px;padding:16px 18px}
+.big{font-size:30px;font-weight:700;color:var(--accent);line-height:1.1}
+.unit{font-size:14px;color:var(--muted);margin-left:5px;font-weight:400}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.7;word-break:break-word}
+.steps{margin:12px 0 0;padding-left:18px;font-size:13.5px;line-height:1.9;color:#374151}
+.steps b{color:var(--ink)}
+.tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:6px;background:#e3eaf6;color:var(--accent);margin-left:8px;vertical-align:middle}
+.warn{background:#fff4e6;color:#9a5b00}
+.ok{background:#e7f6ec;color:#196c3a}
+.bad{background:#fdecec;color:#a12a2a}
+.row-btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ghost{border:1px solid var(--line);background:#fff;color:#374151;padding:9px 14px;border-radius:9px;font-size:13.5px;cursor:pointer}
+button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);margin-top:12px}
+footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.k{font-weight:600;color:#111827}
+table.bt{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+table.bt td{padding:6px 0;border-bottom:1px dashed var(--line)}
+table.bt td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">机</div><h1>机械设计速算工具箱</h1></div>
+  <div class="sub">轴径 · 轴承寿命 · 输送功率 · 零件成本 —— 一个页面算完，公式和过程全显示</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-t="power">输送功率</button>
+  <button class="tab" data-t="shaft">轴径估算</button>
+  <button class="tab" data-t="bearing">轴承寿命</button>
+  <button class="tab" data-t="cost">零件成本</button>
+</nav>
+
+<main>
+  <section class="panel active" id="power">
+    <div class="grid">
+      <div><label>牵引力 F（N）</label><input id="p_f" type="number" value="3000"></div>
+      <div><label>带速 v（m/s）</label><input id="p_v" type="number" value="1.2" step="0.1"></div>
+      <div><label>传动效率 η</label><input id="p_eta" type="number" value="0.85" step="0.01"></div>
+      <div><label>电机转速 n（r/min）</label><input id="p_n" type="number" value="1440"></div>
+    </div>
+    <div class="result">
+      <div><span class="big" id="p_P">—</span><span class="unit">kW</span><span class="tag" id="p_tag"></span></div>
+      <div class="formula" id="p_formula"></div>
+      <ul class="steps" id="p_steps"></ul>
+    </div>
+    <div class="row-btns"><button class="ghost" onclick="demoPower()">载入示例</button></div>
+    <div class="hint">用于带式输送机、链板线等直线牵引场景的功率初算；实际选型需再乘工况系数。</div>
+  </section>
+
+  <section class="panel" id="shaft">
+    <div class="grid">
+      <div><label>传递功率 P（kW）</label><input id="s_P" type="number" value="4.2" step="0.1"></div>
+      <div><label>转速 n（r/min）</label><input id="s_n" type="number" value="75"></div>
+      <div><label>材料（A₀ 取值）</label>
+        <select id="s_A">
+          <option value="145">Q235（A₀=145）</option>
+          <option value="118" selected>45 钢（A₀=118）</option>
+          <option value="110">40Cr（A₀=110）</option>
+          <option value="106">20CrMnTi（A₀=106）</option>
+        </select>
+      </div>
+      <div><label>安全系数（放大 d_min）</label><input id="s_k" type="number" value="1.0" step="0.05"></div>
+    </div>
+    <div class="result">
+      <div><span class="big" id="s_d">—</span><span class="unit">mm</span></div>
+      <div class="formula" id="s_formula"></div>
+      <ul class="steps" id="s_steps"></ul>
+    </div>
+    <div class="row-btns"><button class="ghost" onclick="demoShaft()">载入示例</button></div>
+    <div class="hint">按扭转强度初估最小轴径，再向上取标准直径；最终仍需按弯扭组合校核。</div>
+  </section>
+
+  <section class="panel" id="bearing">
+    <div class="grid">
+      <div><label>基本额定动载荷 C（kN）</label><input id="b_C" type="number" value="31.5" step="0.1"></div>
+      <div><label>当量动载荷 P（kN）</label><input id="b_P" type="number" value="6.2" step="0.1"></div>
+      <div><label>转速 n（r/min）</label><input id="b_n" type="number" value="75"></div>
+      <div><label>目标寿命（h，选填）</label><input id="b_L" type="number" value="20000"></div>
+    </div>
+    <div class="result">
+      <div><span class="big" id="b_L10">—</span><span class="unit">h</span><span class="tag" id="b_tag"></span></div>
+      <div class="formula" id="b_formula"></div>
+      <ul class="steps" id="b_steps"></ul>
+    </div>
+    <div class="row-btns"><button class="ghost" onclick="demoBearing()">载入示例</button></div>
+    <div class="hint">L10h 为 90% 可靠度寿命；重载、冲击、高温工况需再修正。</div>
+  </section>
+
+  <section class="panel" id="cost">
+    <div class="grid">
+      <div><label>材料重量（kg）</label><input id="c_w" type="number" value="2.4" step="0.1"></div>
+      <div><label>材料单价（元/kg）</label><input id="c_p" type="number" value="5.8" step="0.1"></div>
+      <div><label>材料损耗率（%）</label><input id="c_loss" type="number" value="8" step="1"></div>
+      <div><label>加工工时（h/件）</label><input id="c_h" type="number" value="0.6" step="0.05"></div>
+      <div><label>工时费（元/h）</label><input id="c_rate" type="number" value="45" step="1"></div>
+      <div><label>管理费率（%）</label><input id="c_mgmt" type="number" value="12" step="1"></div>
+      <div><label>目标利润率（%）</label><input id="c_profit" type="number" value="15" step="1"></div>
+      <div><label>批量（件）</label><input id="c_qty" type="number" value="500" step="10"></div>
+    </div>
+    <div class="result">
+      <div><span class="big" id="c_price">—</span><span class="unit">元/件</span></div>
+      <table class="bt" id="c_table"></table>
+      <div class="formula" id="c_formula"></div>
+    </div>
+    <div class="row-btns"><button class="ghost" onclick="demoCost()">载入示例</button></div>
+    <div class="hint">用于零部件报价的快速估算；实际报价还要考虑模具摊销、表面处理、运费和税率。</div>
+  </section>
+</main>
+
+<footer>
+  <span>陈诗未 · 机械设计速算工具箱</span>
+  <span>用 AI 辅助开发 · 所有公式可展开核对</span>
+</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const val = id => parseFloat($(id).value);
+const fmt = (x, n=2) => (isFinite(x) ? Number(x).toFixed(n) : '—');
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  $(t.dataset.t).classList.add('active');
+}));
+
+function setTag(el, text, cls){ el.textContent = text; el.className = 'tag ' + cls; }
+
+/* ---------- 输送功率 ---------- */
+function calcPower(){
+  const F = val('p_f'), v = val('p_v'), eta = val('p_eta'), n = val('p_n');
+  if (!(F>0 && v>0 && eta>0)) return;
+  const P = F * v / (1000 * eta);
+  const T = n > 0 ? 9550 * P / n : NaN;
+  $('p_P').textContent = fmt(P, 2);
+  $('p_formula').textContent = `P = F·v / (1000·η) = ${F}×${v} / (1000×${eta}) = ${fmt(P,3)} kW`;
+  $('p_steps').innerHTML =
+    `<li>牵引力 <b>${F} N</b>，带速 <b>${v} m/s</b>，效率 <b>${eta}</b></li>` +
+    `<li>所需功率 <b>${fmt(P,3)} kW</b>，建议电机按 1.1~1.3 倍工况系数选型</li>` +
+    `<li>折算到电机轴的扭矩 ≈ <b>${fmt(T,1)} N·m</b>（n=${n} r/min）</li>`;
+  setTag($('p_tag'), P < 3 ? '小功率' : P < 11 ? '常规功率' : '大功率', 'ok');
+}
+
+/* ---------- 轴径 ---------- */
+const series = [10,12,14,16,18,20,22,25,28,30,32,35,38,40,42,45,48,50,55,60,65,70,75,80,85,90,95,100,105,110,120,125,130,140,150];
+function roundUp(d){ for (const s of series) if (s >= d) return s; return Math.ceil(d/10)*10; }
+
+function calcShaft(){
+  const P = val('s_P'), n = val('s_n'), A = parseFloat($('s_A').value), k = val('s_k') || 1;
+  if (!(P>0 && n>0)) return;
+  const d0 = A * Math.cbrt(P / n) * k;
+  const d = roundUp(d0);
+  const T = 9550 * P / n;
+  $('s_d').textContent = d;
+  $('s_formula').textContent = `d ≥ A₀·(P/n)^(1/3) = ${A}×(${P}/${n})^(1/3) = ${fmt(d0,2)} mm → 取标准值 ${d} mm`;
+  $('s_steps').innerHTML =
+    `<li>功率 <b>${P} kW</b>，转速 <b>${n} r/min</b>，扭矩 <b>${fmt(T,1)} N·m</b></li>` +
+    `<li>计算最小轴径 <b>${fmt(d0,2)} mm</b>，向上取标准直径 <b>${d} mm</b></li>` +
+    `<li>该值只保证扭转强度，装配处还需按弯扭组合与键槽削弱重新校核</li>`;
+}
+
+/* ---------- 轴承 ---------- */
+function calcBearing(){
+  const C = val('b_C'), P = val('b_P'), n = val('b_n'), L = val('b_L');
+  if (!(C>0 && P>0 && n>0)) return;
+  const L10 = (1e6/(60*n)) * Math.pow(C/P, 3);
+  $('b_L10').textContent = L10 >= 1e5 ? (L10/1000).toFixed(0) + 'k' : Math.round(L10).toLocaleString();
+  $('b_formula').textContent = `L₁₀ₕ = (10⁶/(60n))·(C/P)³ = (10⁶/(60×${n}))×(${C}/${P})³ = ${Math.round(L10).toLocaleString()} h`;
+  let judge = '', cls = 'ok';
+  if (L10 >= 20000) { judge = '长寿命'; cls = 'ok'; }
+  else if (L10 >= 10000) { judge = '中等寿命'; cls = 'ok'; }
+  else if (L10 >= 5000) { judge = '偏短，需复核'; cls = 'warn'; }
+  else { judge = '寿命不足'; cls = 'bad'; }
+  setTag($('b_tag'), judge, cls);
+  let extra = '';
+  if (L > 0) {
+    const Creq = P * Math.cbrt(60*n*L/1e6);
+    extra = `<li>若目标寿命 <b>${L} h</b>，所需 C ≥ <b>${fmt(Creq,1)} kN</b>（当前 ${C} kN${C>=Creq?'，满足':'，不足'}）</li>`;
+  }
+  $('b_steps').innerHTML =
+    `<li>载荷比 C/P = <b>${fmt(C/P,2)}</b>，转速 <b>${n} r/min</b></li>` +
+    `<li>额定寿命约 <b>${Math.round(L10).toLocaleString()} h</b></li>` + extra;
+}
+
+/* ---------- 成本 ---------- */
+function calcCost(){
+  const w = val('c_w'), p = val('c_p'), loss = val('c_loss')/100;
+  const h = val('c_h'), rate = val('c_rate'), mgmt = val('c_mgmt')/100;
+  const profit = val('c_profit')/100, qty = val('c_qty');
+  if (!(w>=0 && p>=0)) return;
+  const mat = w * p * (1 + loss);
+  const labor = h * rate;
+  const base = mat + labor;
+  const overhead = base * mgmt;
+  const cost = base + overhead;
+  const price = cost * (1 + profit);
+  $('c_price').textContent = fmt(price, 2);
+  $('c_table').innerHTML =
+    `<tr><td>材料费（含损耗）</td><td>${fmt(mat,2)} 元</td></tr>` +
+    `<tr><td>加工费</td><td>${fmt(labor,2)} 元</td></tr>` +
+    `<tr><td>管理费 ${(mgmt*100).toFixed(0)}%</td><td>${fmt(overhead,2)} 元</td></tr>` +
+    `<tr><td><span class="k">单件成本</span></td><td><span class="k">${fmt(cost,2)} 元</span></td></tr>` +
+    `<tr><td>报价（含 ${(profit*100).toFixed(0)}% 利润）</td><td>${fmt(price,2)} 元</td></tr>` +
+    `<tr><td>批量 ${qty} 件合计</td><td>${fmt(price*qty,0)} 元</td></tr>`;
+  $('c_formula').textContent = `成本 = (材料 + 加工)×(1+管理费率)；报价 = 成本×(1+利润率)`;
+}
+
+/* ---------- 示例 ---------- */
+function demoPower(){ $('p_f').value=3000; $('p_v').value=1.2; $('p_eta').value=0.85; $('p_n').value=1440; calcPower(); }
+function demoShaft(){ $('s_P').value=4.2; $('s_n').value=75; $('s_A').value='118'; $('s_k').value=1.0; calcShaft(); }
+function demoBearing(){ $('b_C').value=31.5; $('b_P').value=6.2; $('b_n').value=75; $('b_L').value=20000; calcBearing(); }
+function demoCost(){ $('c_w').value=2.4; $('c_p').value=5.8; $('c_loss').value=8; $('c_h').value=0.6; $('c_rate').value=45; $('c_mgmt').value=12; $('c_profit').value=15; $('c_qty').value=500; calcCost(); }
+
+document.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => {
+  calcPower(); calcShaft(); calcBearing(); calcCost();
+}));
+calcPower(); calcShaft(); calcBearing(); calcCost();
+</script>
+</body>
+</html>

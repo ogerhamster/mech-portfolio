@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>陈诗未 · 机械设计作品集</title>
+<style>
+:root{--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--accent:#1F3864;--bg:#f6f7f9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding:56px 20px 48px}
+header{margin-bottom:36px}
+h1{font-size:32px;margin:0;color:var(--accent);letter-spacing:.5px}
+.sub{color:var(--muted);margin-top:8px;font-size:14px}
+.tagline{margin-top:16px;font-size:15px;color:#374151;border-left:3px solid var(--accent);padding-left:12px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:640px){.cards{grid-template-columns:1fr}}
+.card{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;text-decoration:none;color:inherit;transition:.15s;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.card:hover{border-color:#9FB3D9;transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,56,100,.08)}
+.k{display:inline-block;font-size:11px;letter-spacing:1px;color:#fff;background:var(--accent);padding:3px 8px;border-radius:5px}
+.card h2{font-size:17px;margin:12px 0 8px;color:#111827}
+.card p{font-size:13.5px;color:#4b5563;margin:0 0 14px;min-height:44px}
+.go{font-size:13px;color:var(--accent);font-weight:600}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+a.mail{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>陈诗未</h1>
+  <div class="sub">机械设计制造及其自动化 · 2026 届 · 重庆交通大学</div>
+  <div class="tagline">用 AI 把想法变成可交付的成品：两个可以当场打开的东西。</div>
+</header>
+<main class="cards">
+  <a class="card" href="toolbox.html">
+    <span class="k">工具</span>
+    <h2>机械设计速算工具箱</h2>
+    <p>输送功率、轴径、轴承寿命、零件成本四个模块，每个结果都展开公式和计算过程。</p>
+    <span class="go">打开工具 →</span>
+  </a>
+  <a class="card" href="calc.html">
+    <span class="k">案例</span>
+    <h2>带式输送机传动轴设计计算书</h2>
+    <p>用工具箱完成初算，再按弯扭组合复核：扭转初估 48 mm 为什么不够，最终为什么定 60 mm。</p>
+    <span class="go">打开计算书 →</span>
+  </a>
+</main>
+<footer>
+  <span>Word 版：<a class="mail" href="calc.docx">传动轴设计计算书.docx</a></span>
+  <span>邮箱 3195484917@qq.com</span>
+</footer>
+</div>
+</body>
+</html>
